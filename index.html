@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rebuild</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.1/css/bulma.min.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+
+
+    <script type="text/javascript" src="js/cookies.js">
+
+    </script>
+    <script type="text/javascript" src="js/login.js">
+
+    </script>
+<script src="js/localStorage.js" charset="utf-8"></script>
+<script type="text/javascript">
+  var logindata;
+</script>
+  </head>
+  <!-- Here starts the body -->
+  <body onload="getUSerInfo('lgndata')">
+
+    <div class="pageloader" id="pageloader">
+    </div>
+
+
+<section class="hero is-primary is-fullheight" id="home" style="background:linear-gradient(90deg,rgba(0, 209, 178,0.8),rgba(255,0,255,0.2)),url('images/bg.png') center center no-repeat;
+  background-size: cover;">
+<div class="hero-body">
+<div class="container">
+  <div class="columns">
+  <div class="column is-two-thirds">
+    <h1 class="title">
+      Report-Builder
+    </h1>
+    <h2 class="subtitle">
+      Kony way of building the reports
+    </h2>
+  </div>
+
+  <div class="column is-primary">
+    <div class="box">
+      <div class="field">
+  <label class="label">Username</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="username" id="username">
+  </div>
+</div>
+<div class="field">
+<label class="label">Password</label>
+<div class="control">
+<input class="input" type="password" placeholder="password" id="password">
+</div>
+</div>
+
+
+<div class="control">
+   <div class="button is-primary" href="" onclick="onClickingLoginButton()">Login</div>
+ </div>
+
+    </div>
+
+
+
+  </div>
+</div>
+
+
+</div>
+</div>
+</section>
+
+</body>
+</html>

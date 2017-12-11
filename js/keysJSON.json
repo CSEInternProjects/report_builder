@@ -1,0 +1,18 @@
+var columnsoFtable={
+"Id":1,
+"Created_at":1,
+"Ticket_type":0,
+"Satisfaction_Score":1,
+"Severity_":1,
+"Status":1,
+"Updated_at":1,
+"Product_Support_Assignee_":0,
+"Subject":1,
+"Organization":0,
+"Customer_Name_":0,
+"Complexity_":0,
+"Severity_History_":0,
+"CSE_-_Root_Cause_Category_":0,
+"CSE_Team_Assigned":0,
+"Account_":0
+}

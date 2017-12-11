@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Display Page</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="css/bulma.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/css/selectize.min.css">
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript" src="js/jquery.min.js">
+  </script>
+  <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"> -->
+
+  <!-- </script> -->
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+  <script type="text/javascript" src="http://html2canvas.hertzen.com/build/html2canvas.js"></script>
+
+
+  <script src="js/custom_chart.js" charset="utf-8"></script>
+
+  <!-- <script src="js/classifiers_ErrorHandler.js" charset="utf-8"></script> -->
+
+  <script src="js/chartBuilder.js" charset="utf-8"></script>
+
+  <script src="js/tabnav.js" charset="utf-8"></script>
+
+  <script src="js/dataCleaner.js" charset="utf-8"></script>
+
+  <script type="text/javascript" src="js/all_chart_functions.js"></script>
+  <script type="text/javascript" src="js/custom_bulider.js"></script>
+
+  <script src="js/datepicker.js" charset="utf-8"></script>
+  <script src="js/custom_chart.js" charset="utf-8"></script>
+  <script src="js/SecondPagelocalStorage.js" charset="utf-8"></script>
+
+  <script src="js/colorformation.js" charset="utf-8"></script>
+    <script src="js/dateFunction.js" charset="utf-8"></script>
+
+
+
+  <!-- <script src='js/interact.min.js'></script> -->
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <script src="js/scrollreveal.min.js" charset="utf-8"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js">
+  </script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script> -->
+  <script src="js/chart.util.js" charset="utf-8"></script>
+  <script src="js/chart.bundle.js" charset="utf-8"></script>
+  <!-- <script src="https://github.com/garipov/chartsjs-plugin-data-labels/releases/download/v0.1.3/chartsjs-plugin-data-labels.js"></script> -->
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+  <!-- <script type="text/javascript" src="http://html2canvas.hertzen.com/build/html2canvas.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/js/standalone/selectize.min.js"></script>
+  <!-- this is newly added file -->
+  <script src="js/keysJSON.json" charset="utf-8"></script>
+
+  <script src="js/filesaver.js" charset="utf-8"></script>
+
+  <script src="js/chartjs_annotation.js" charset="utf-8"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      $("#tabs").tabs();
+    });
+  </script>
+
+  <script type="text/javascript">
+    var globaldt;
+    var globalRawdt;
+    switch_pc = 1;
+
+
+    window.sr = ScrollReveal({
+      duration: 1000,
+      reset: true
+    });
+    sr.reveal('#example', 100);
+    chart_ids = [];
+
+
+    startmonth = 0;
+    endmonth = 11;
+    month_names = {
+      0: "JAN",
+      1: "FEB",
+      2: "MAR",
+      3: "APR",
+      4: "MAY",
+      5: "JUN",
+      6: "JUL",
+      7: "AUG",
+      8: "SEP",
+      9: "OCT",
+      10: "NOV",
+      11: "DEC"
+    };
+    colors = ['rgba(223,34,34,0.7)', 'rgba(255,187,25,0.7)', 'rgba(24,143,197,0.7)', 'rgba(133,171,68,0.7)', 'rgba(193,193,193,0.7)', 'rgba(25,106,144,0.7)', 'rgba(77,137,64,0.7)', 'rgba(165,25,25,0.7)', 'rgba(88,45,122,0.7)', 'rgba(113,73,172,0.7)',
+      'rgba(113,171,172,0.7)', 'rgba(213,13,172,0.7)', 'rgba(113,133,222,0.7)'
+    ];
+    borderColors = ['rgba(223,34,34,1)', 'rgba(255,187,25,1)', 'rgba(24,143,197,1)', 'rgba(133,171,68,1)', 'rgba(193,193,193,1)', 'rgba(25,106,144,1)', 'rgba(77,137,64,1)', 'rgba(165,25,25,1)', 'rgba(88,45,122,1)', 'rgba(113,73,172,1)',
+      'rgba(113,171,172,0.7)', 'rgba(213,13,172,0.7)', 'rgba(113,133,222,0.7)'
+    ];
+
+
+    toolTipJson = {
+      "organizationTooltip": "Here are all the organizations list",
+      "clientsTooltip": "Here you can eithor select client or partner",
+      "toggleTooltip": "Toggle to change the view of schema",
+      "modifyColumnTooltip": "Modify the view of columns",
+      "excelExportTooltip": "Here you can export to Excel",
+      "exportPdfTootip": "Here you can download the charts to PDF",
+    }
+    //  myvalue = 1;
+
+    function drawstackedbarchart(type_of_chart, chart_id, chart_data, chart_options, flage, ftr) {
+      chart_ids.push(chart_id);
+
+      if (flage) {
+        if (ftr)
+          document.getElementById('' + chart_id + '_').innerHTML = '  <canvas id="' + chart_id + '" width="" height=""></canvas><p>No FTR Tickets</p><p id="' + chart_id + "avg" + '"></p>';
+        else {
+          document.getElementById('' + chart_id + '_').innerHTML = '  <canvas id="' + chart_id + '" width="" height=""></canvas><p id="' + chart_id + "avg" + '"></p>';
+        }
+        var bar_ctx = document.getElementById(chart_id);
+
+
+        var bar_chart = new Chart(bar_ctx, {
+          type: type_of_chart,
+          data: chart_data,
+          options: chart_options,
+          animationEasing: 'linear'
+        });
+      } else {
+        var s = chart_id.split("_").join(" ");
+        if (ftr)
+          document.getElementById('' + chart_id + '_').innerHTML = '  <h2 id="' + chart_id + '" width="" height="">DATA NOT AVAILABLE FOR <B>"' + s + '"</B></h2><p>No FTR Tickets</p><p id="' + chart_id + "avg" + '"></p>'
+        else {
+          document.getElementById('' + chart_id + '_').innerHTML = '  <h2 id="' + chart_id + '" width="" height="">DATA NOT AVAILABLE FOR <B>"' + s + '"</B></h2><p id="' + chart_id + "avg" + '"></p>'
+        }
+      }
+
+      sr.reveal('#' + chart_id + '_', 100);
+
+
+
+      // myvalue++;
+    }
+
+
+    function tooltipdata() {
+      document.getElementById("organizationTooltip").setAttribute("data-tooltip", "Select an Organization");
+    }
+  </script>
+
+  <script src="js/chart17.js" charset="utf-8"></script>
+  <script src="js/chart16.js" charset="utf-8"></script>
+  <script src="js/chart15.js" charset="utf-8"></script>
+  <script src="js/chart14.js" charset="utf-8"></script>
+  <script src="js/chart13.js" charset="utf-8"></script>
+  <script src="js/chart12.js" charset="utf-8"></script>
+  <script src="js/chart11.js" charset="utf-8"></script>
+  <script src="js/chart10.js" charset="utf-8"></script>
+  <script src="js/chart9.js" charset="utf-8"></script>
+  <!-- <script src="js/chart9.js" charset="utf-8"></script> -->
+  <script src="js/chart8.js" charset="utf-8"></script>
+  <script src="js/chart7.js" charset="utf-8"></script>
+  <script src="js/chart6.js" charset="utf-8"></script>
+  <script src="js/chart5.js" charset="utf-8"></script>
+  <script src="js/chart4.js" charset="utf-8"></script>
+  <script src="js/chart3.js" charset="utf-8"></script>
+  <script src="js/chart2.js" charset="utf-8"></script>
+  <script src="js/chart1.js"></script>
+  <script type="text/javascript" src="js/chartBuilder.js">
+  </script>
+  <script type="text/javascript" src="js/excelconverter.js">
+  </script>
+  <script type="text/javascript" src="js/toExcel.js">
+  </script>
+  <script type="text/javascript" src="js/chart_pdf.js">
+  </script>
+
+</head>
+
+<body onload="getUserInfoInSecondPage();" style="background:#fbf9f9">
+
+  <div class="pageloader" id="pageloader">
+  </div>
+
+  <nav class="navbar is-dark" style="z-index:11; background:hsl(0, 0%, 29%);">
+    <div class="navbar-brand">
+      <div class="navbar-item" href="">
+        <h1 class="has-text-weight-normal is-size-4">Report Builder</h1>
+      </div>
+    </div>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <p class="control">
+          <div class="button is-danger" onclick="logout()">
+            Logout
+          </div>
+        </p>
+      </div>
+
+    </div>
+  </nav>
+
+
+
+  <style media="screen">
+    .selectize-control.multi .selectize-input.has-items {
+      padding: 4px 4px 3px;
+      height: 80px;
+      overflow-y: auto;
+    }
+
+    th {
+      font-size: 12px;
+    }
+
+    td {
+      font-size: 14px;
+    }
+
+    .menu-label {
+      color: #eee
+    }
+
+
+    .he {
+      position: absolute;
+      top: 0%;
+      left: 0%;
+      height: 50%;
+      width: 100%;
+      background: #000;
+    }
+
+    .ll {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      height: 50%;
+    }
+
+
+
+    .nav-wrapper1 {
+      height: 20%:
+    }
+  </style>
+  <!-- just to check the tab pane functionality -->
+
+  <!-- <div class="tabs is-boxed">
+  <ul>
+    <li class="is-active"><a onclick="openTab('tabler')">Pictures</a>
+    </li>
+    <li><a  onclick="openTab('tabler')">Music</a></li>
+    <li><a  onclick="openTab('tabler')">Videos</a></li>
+    <li><a  onclick="openTab('tabler')">Documents</a></li>
+  </ul>
+</div> -->
+
+  <!-- end of the example -->
+  <div class="container is-fullhd">
+    <div class="columns">
+      <div class="column is-2 is-sidebar-menu" style="position:sticky;top:0%;height:664px; padding-left: 1.0rem;background: hsl(0, 0%, 29%);overflow:hidden">
+
+        <aside class="menu">
+          <br>
+          <br>
+          <ul>
+            <li>
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <select id="selectMode" style="width:200px">
+                        <option disabled>Type of Tickets</option>
+                        <option selected value="created_at">Created Tickets</option>
+                        <option value="resolved_at">Resolved Tickets</option>
+                        <option value="both">Both</option>
+                      </select>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <p class="menu-label"> From Date</p>
+          <ul class="menu-list">
+            <li>
+              <div class="field">
+                <div class="control">
+                  <div>
+                    <input id="fromDate" class="input" type="date" style="width:200px" value="2017-01-01">
+                  </div>
+                </div>
+
+              </div>
+            </li>
+          </ul>
+          <p class="menu-label"> To Date</p>
+          <ul class="menu-list">
+            <li>
+              <div class="field">
+                <div class="control">
+                  <div>
+                    <input id="toDate" class="input" type="date" style="width:200px" value="2017-10-01">
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <br>
+          <ul>
+            <li>
+              <center>
+                <p class="has-text-white">Tickets Logged</p>
+              </center>
+              <div class="position" style="position: absolute; width: 95%;">
+                <div class="is-primary">
+                  <center>
+                    <label for="switchThinColorDefault" class="has-text-white">By</label>
+                    <input id="switchThinColorDefault" type="checkbox" value="OFF" name="switchThinColorDefault" class="switch is-thin" style="width: 10%; height: 10%;" onclick="doload1(this);">
+                    <label for="switchThinColorDefault" class="has-text-white">For</label>
+                  </center>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <br>
+          <br>
+          <p class="menu-label" id="innerTextOne">
+            Organization
+          </p>
+          <ul class="menu-list">
+            <li>
+              <div class="field">
+                <div class="control">
+                  <div class="select">
+                    <div class="is-tooltip-warning tooltip" id="organizationTooltip" data-tooltip="Select an Organization.">
+                      <select id="OrganizationalSelect" style="width:200px">
+
+                    </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <p class="menu-label" id="innerTextTwo">
+            For
+          </p>
+          <ul class="menu-list">
+            <li>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <div class="select">
+                      <div class="is-primary is-tooltip-warning tooltip" data-tooltip="related clients or the organizations.">
+                        <select id="PartnerSelect" style="width:200px; height:300px;overflow:auto" multiple>
+                      <!-- <option value="Busine">Business development</option>
+                      <option value="Mark">Marketing</option>
+                      <option value="Sales">Sales</option> -->
+                    </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+          </ul>
+          <br>
+          <br>
+
+          <p class="menu-label"> <button class='button is-primary' name="button" style="width:200px" onclick="dateCompare();">Submit</button></p>
+          <ul class="menu-list">
+
+          </ul>
+
+
+        </aside>
+      </div>
+
+      <div class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">Modify Columns</p>
+            <button class="delete" id="modal-close" aria-label="close"></button>
+          </header>
+          <section class="modal-card-body" id="modal-card-body">
+            <div class="columns" id="checkboxcolumns">
+
+            </div>
+
+          </section>
+          <footer class="modal-card-foot">
+            <button class="button is-success" id="save-changes" onclick="makechangesToJson()">Save changes</button>
+            <button class="button" id="cancel-btn">Cancel</button>
+          </footer>
+        </div>
+      </div>
+
+      <div class="column is-10" id="tabs">
+        <br>
+
+        <div class="tabs is-toggle is-fullwidth" id="idTabs" style="display:none;">
+
+
+          <ul>
+
+            <li id="all-tab" class="is-active mainer ">
+
+              <a onClick="switchToAll()" data-tooltip="Here you can see all the data in Tabuler format.">
+
+                <span>Raw Data</span>
+          </a>
+
+            </li>
+            <li id="adaptivedesign-tab" class="mainer">
+              <a onClick="switchToAdaptiveDesign()">
+
+        <span>Standard Charts</span>
+      </a>
+            </li>
+            <li id="jquery-tab" class="mainer">
+              <a onClick="switchToJquery()">
+        <span class="icon is-small"><i class="fa fa-file-code-o"></i></span>
+        <span>Custom Charts</span>
+      </a>
+            </li>
+
+
+          </ul>
+        </div>
+
+
+        <div class="container is-fluid" id="instructions">
+          <div class="notification is-light">
+            <h1 class="has-text-grey-darker">
+            <strong>Instructions 📖:</strong></h1>
+            <ol>
+              <li>Select your desired Organization name <i>Ex:Accenture</i></li>
+              <li>Now if there are any Clients then select the client <i>Ex: ABInBev</i></li>
+              <li>Select from Date <i>Ex:09/01/2016</i></li>
+              <li>Select to Date <i>Ex:09/01/2017</i></li>
+              <li>Now click on Submit Button and what happens next blows your mind 🙂</li>
+            </ol>
+          </div>
+        </div>
+
+
+
+        <div id="all-tab-content">
+          <div class="container is-fullhd" style="display:none; overflow:auto;width:100%;" id="tabler">
+            <div class="box">
+              <div class="content">
+                <p>
+                  <a class="button is-primary is-pulled-left is-primary tooltip is-tooltip-bottom" data-tooltip="Modify the view of data." id="showModal">
+                      Modify Cloumns</a>
+                  <a class="button is-danger is-pulled-right is-primary tooltip is-tooltip-left" data-tooltip="Click here to export to Excel." id="export_btn_rawdata">Export</a>
+                </p>
+                <br>
+              </div>
+
+              <div id="tablerContent">
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <div class="hidden" id="adaptivedesign-tab-content">
+          <div class="container is-fluid" style="display:none" id="charter">
+
+            <a class="button is-danger is-pulled-right is-primary tooltip is-tooltip-left" data-tooltip="Click here to export to PDF." id="export_btn_standardcharts">Export</a>
+            <br><br>
+            <div class="columns">
+              <div class="column ">
+
+                <div class="box" id="volume_vs_month_">
+                  <!-- <canvas id="volume_vs_month" width="" height=""></canvas> -->
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="volume_vs_status_vs_type1_">
+                  <!-- <canvas id="volume_vs_status_vs_type1" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="volume_vs_sev_vs_mon_">
+                  <!-- <canvas id="volume_vs_sev_vs_mon" width="" height=""></canvas> -->
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="volume_vs_status_vs_type2_">
+                  <!-- <canvas id="volume_vs_status_vs_type2" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box is-dark" style="width: 1050px;" id="volume_vs_pc_">
+                  <!-- <canvas id="volume_vs_pc" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+            <div class="columns">
+              <div class="column ">
+                <div class="box" style="width: 1050px;" id="volume_vs_version_vs_pc_">
+                  <!-- <canvas id="volume_vs_version_vs_pc" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="ticketVolumeVsSource_">
+                  <!-- <canvas id="ticketVolumeVsSource" width="" height=""></canvas> -->
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="Ageing_of_Closed_vs_severity_">
+                  <!-- <canvas id="Ageing_of_Closed_vs_severity" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="mttrofl2_vs_severity_">
+                  <!-- <canvas id="mttrofl2_vs_severity" width="" height=""></canvas> -->
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="mttrofl3_vs_severity_">
+                  <!-- <canvas id="mttrofl3_vs_severity" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="mttr_vs_severity_">
+                  <!-- <canvas id="mttr_vs_severity" width="" height=""></canvas> -->
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="categorized_RCA_">
+
+                  <!-- <canvas id="categorized_RCA" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="escalated_vs_status_vs_sev_">
+
+                  <!-- <canvas id="escalated_vs_status_vs_sev" width="" height=""></canvas> -->
+
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="csatVsSource_">
+                  <!-- <canvas id="csatVsSource" width="" height=""></canvas> -->
+
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="response_target_">
+
+                  <!-- <canvas id="response_target" width="" height=""></canvas> -->
+
+                </div>
+              </div>
+              <div class="column">
+                <div class="box" id="resolution_target_">
+                  <!-- <canvas id="resolution_target" width="" height=""></canvas> -->
+                </div>
+              </div>
+            </div>
+            <div class="columns">
+              <div class="column ">
+                <div class="box" id="ageing_of_open_vs_severity_">
+
+                  <!-- <canvas id="ageing_of_open_vs_severity" width="" height=""></canvas> -->
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- <div class="hidden" id="jquery-tab-content">
+          <h1 class="title is-1" style="text-align:center;">Here will be the contents of the "jQuery" tab</h1>
+        </div> -->
+
+
+
+
+
+
+
+
+        <div class="container is-fluid" style="display:none" id="customcharter">
+          <div class="container is-fluid">
+            <div class="columns">
+
+              <div class="column">
+                <center>
+                  <div class="box" style="width: 600px;" id="custom_charter_naa">
+                    <canvas id="custom_charter_nee" width="" height=""></canvas>
+                  </div>
+
+                </center>
+              </div>
+
+
+              <a href="#" class="button" id="export_btn_customchart">Download</a>
+
+
+            </div>
+          </div>
+          <div class="container is-fluid">
+
+            <div class="tabs is-centered">
+              <ul>
+                <li id="barchart-tab" class="is-active submainer">
+                  <a onClick="switchToBarChart()">
+
+            <span>Bar</span>
+          </a>
+                </li>
+                <li id="linechart-tab" class="submainer">
+                  <a onClick="switchToLineChart()">
+
+            <span>Line</span>
+          </a>
+                </li>
+                <li id="piechart-tab" class="submainer">
+                  <a onClick="switchToPieChart()">
+
+            <span>Doughnut</span>
+          </a>
+                </li>
+                <li id="stBar-tab" class="submainer">
+                  <a onClick="switchToStBarChart()">
+
+            <span>Stacked Bar</span>
+          </a>
+                </li>
+                <li id="GrBar-tab" class="submainer">
+                  <a onClick="switchToGrpBarChart()">
+
+            <span>Grouped Bar</span>
+          </a>
+                </li>
+
+              </ul>
+            </div>
+
+            <div id="test1">
+              <div class="columns">
+
+
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>X-axis</strong>
+                    <div class="field" id="x_axis_field">
+                      <input class="is-radio" checked id="status_rbtn" type="radio" name="exampleRadioInline1" value="status" onclick="showClassifiers('status')">
+                      <label for="status_rbtn">Status</label>
+                      <br>
+                      <input class="is-radio" id="severity_rbtn" type="radio" name="exampleRadioInline1" value="severity" onclick="showClassifiers('severity')">
+                      <label for="severity_rbtn">Severity</label>
+                      <input class="is-radio" id="pc_rbtn" type="radio" name="exampleRadioInline1" value="platform category" onclick="showClassifiers('platform category')">
+                      <label for="pc_rbtn">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn" type="radio" name="exampleRadioInline1" value="source" onclick="showClassifiers('source')">
+                      <label for="source_rbtn">Source</label>
+                      <input class="is-radio" id="month_rbtn" type="radio" name="exampleRadioInline1" value="month" onclick="showClassifiers('month')">
+                      <label for="month_rbtn">Month</label>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiers">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column">
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="box" style="width:300px;" id="">
+
+                    <strong>Y-axis</strong>
+                    <div class="field" id="y_axis_selectors">
+                      <input class="is-radio" id="volume_rbtn" checked type="radio" name="exampleRadioInline_y_1" value="volume" onclick="setSelected_Y_Val('volume')">
+                      <label for="volume_rbtn">Volume</label>
+                      <br>
+                      <input class="is-radio" id="escalated_volume_rbtn" type="radio" name="exampleRadioInline_y_1" value="escalated volume" onclick="setSelected_Y_Val('escalated volume')">
+                      <label for="escalated_volume_rbtn">Escalated Volume</label>
+                      <br>
+                      <input class="is-radio" id="mttr_rbtn" type="radio" name="exampleRadioInline_y_1" value="mttr" onclick="setSelected_Y_Val('mttr')">
+                      <label for="mttr_rbtn">MTTR</label>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="column">
+                  <div class="control">
+                    <button class="button is-primary" onclick=" barchart(); ">Create</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <div id="test2" class="col s12">
+              <div class="columns">
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>X-axis</strong>
+                    <div class="field" id="x_axis_field">
+                      <input class="is-radio" checked id="status_rbtn" type="radio" name="exampleRadioInline2" value="status" onclick="showClassifiers('status')">
+                      <label for="status_rbtn">Status</label>
+                      <br>
+                      <input class="is-radio" id="severity_rbtn" type="radio" name="exampleRadioInline2" value="severity" onclick="showClassifiers('severity')">
+                      <label for="severity_rbtn">Severity</label>
+                      <input class="is-radio" id="pc_rbtn" type="radio" name="exampleRadioInline2" value="platform category" onclick="showClassifiers('platform category')">
+                      <label for="pc_rbtn">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn" type="radio" name="exampleRadioInline2" value="source" onclick="showClassifiers('source')">
+                      <label for="source_rbtn">Source</label>
+                      <input class="is-radio" id="month_rbtn" type="radio" name="exampleRadioInline2" value="month" onclick="showClassifiers('month')">
+                      <label for="month_rbtn">Month</label>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiers">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column">
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="box" style="width:300px;" id="">
+
+                    <strong>Y-axis</strong>
+                    <div class="field" id="y_axis_selectors">
+                      <input class="is-radio" id="volume_rbtn" checked type="radio" name="exampleRadioInline_y_2" value="volume" onclick="setSelected_Y_Val('volume')">
+                      <label for="volume_rbtn">Volume</label>
+                      <br>
+                      <input class="is-radio" id="escalated_volume_rbtn" type="radio" name="exampleRadioInline_y_2" value="escalated volume" onclick="setSelected_Y_Val('escalated volume')">
+                      <label for="escalated_volume_rbtn">Escalated Volume</label>
+                      <br>
+                      <input class="is-radio" id="mttr_rbtn" type="radio" name="exampleRadioInline_y_2" value="mttr" onclick="setSelected_Y_Val('mttr')">
+                      <label for="mttr_rbtn">MTTR</label>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="column">
+                  <div class="control">
+                    <button class="button is-primary" onclick="linechart();">Create</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div id="test3" class="col s12">
+              <div class="columns">
+
+
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>X-axis</strong>
+                    <div class="field" id="x_axis_field">
+                      <input class="is-radio" id="status_rbtn" checked type="radio" name="exampleRadioInline3" value="status" onclick="showClassifiers('status')">
+                      <label for="status_rbtn">Status</label>
+                      <br>
+                      <input class="is-radio" id="severity_rbtn" type="radio" name="exampleRadioInline3" value="severity" onclick="showClassifiers('severity')">
+                      <label for="severity_rbtn">Severity</label>
+                      <input class="is-radio" id="pc_rbtn" type="radio" name="exampleRadioInline3" value="platform category" onclick="showClassifiers('platform category')">
+                      <label for="pc_rbtn">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn" type="radio" name="exampleRadioInline3" value="source" onclick="showClassifiers('source')">
+                      <label for="source_rbtn">Source</label>
+                      <input class="is-radio" id="month_rbtn" type="radio" name="exampleRadioInline3" value="month" onclick="showClassifiers('month')">
+                      <label for="month_rbtn">Month</label>
+                      <br>
+                      <!-- <input class="is-radio" id="type1_rbtn" type="radio" name="exampleRadioInline3" value="type1" onclick="showClassifiers('type1')">
+                      <label for="type1_rbtn">Product Support/Product Defect</label>
+                      <br>
+                      <input class="is-radio" id="type2_rbtn" type="radio" name="exampleRadioInline3" value="type2" onclick="showClassifiers('type2')">
+                      <label for="type2_rbtn">FTR or Regular Ticket</label>
+                      <br>
+                      <input class="is-radio" id="allTickets_rbtn" type="radio" name="exampleRadioInline3" value="All Tickets" onclick="showClassifiers('All Tickets')">
+                      <label for="allTickets_rbtn">All Tickets</label>
+                      <input class="is-radio" id="responeseTarget_rbtn" type="radio" name="exampleRadioInline3" value="Response Target" onclick="showClassifiers('Response Target)">
+                      <label for="responseTarget_rbtn">Response Target</label>
+                      <br>
+                      <input class="is-radio" id="esclationReason_rbtn" type="radio" name="exampleRadioInline3" value="Esclation Reason" onclick="showClassifiers('Esclation Reason')">
+                      <label for="esclationReason_rbtn">Esclation Reason</label> -->
+                      <br>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiers">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column">
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>Z-axis</strong>
+                    <div class="field" id="z_axis_field">
+                      <input class="is-radio" id="status_rbtn_z" type="radio" name="exampleRadioInline_3_z" value="status" onclick="showClassifiersForZ_axis('status')">
+                      <label for="status_rbtn_z">Status</label>
+                      <br>
+                      <input class="is-radio" checked id="severity_rbtn_z" type="radio" name="exampleRadioInline_3_z" value="severity" onclick="showClassifiersForZ_axis('severity')">
+                      <label for="severity_rbtn_z">Severity</label>
+                      <input class="is-radio" id="pc_rbtn_z" type="radio" name="exampleRadioInline_3_z" value="platform category" onclick="showClassifiersForZ_axis('platform category')">
+                      <label for="pc_rbtn_z">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn_z" type="radio" name="exampleRadioInline_3_z" value="source" onclick="showClassifiersForZ_axis('source')">
+                      <label for="source_rbtn_z">Source</label>
+                      <input class="is-radio" id="month_rbtn_z" type="radio" name="exampleRadioInline_3_z" value="month" onclick="showClassifiersForZ_axis('month')">
+                      <label for="month_rbtn_z">Month</label>
+                      <br>
+                      <!-- <input class="is-radio" id="type1_rbtn_z" type="radio" name="exampleRadioInline3_z" value="type1" onclick="showClassifiersForZ_axis('type1')">
+                      <label for="type1_rbtn_z">Product Support/Product Defect</label>
+                      <br>
+                      <input class="is-radio" id="type2_rbtn_z" type="radio" name="exampleRadioInline3_z" value="type2" onclick="showClassifiersForZ_axis('type2')">
+                      <label for="type2_rbtn_z">FTR or Regular Ticket</label>
+                      <br>
+                      <input class="is-radio" id="allTickets_rbtn_z" type="radio" name="exampleRadioInline3_z" value="All Tickets" onclick="showClassifiersForZ_axis('All Tickets')">
+                      <label for="allTickets_rbtn_z">All Tickets</label>
+                      <input class="is-radio" id="responeseTarget_rbtn_z" type="radio" name="exampleRadioInline3_z" value="Response Target" onclick="showClassifiersForZ_axis('Response Target')">
+                      <label for="responseTarget_rbtn_z">Response Target</label>
+                      <br>
+                      <input class="is-radio" id="esclationReason_rbtn_z" type="radio" name="exampleRadioInline3_z" value="Esclation Reason" onclick="showClassifiers('Escalation Reason')">
+                      <label for="esclationReason_rbtn_z">Esclation Reason</label> -->
+                      <br>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiersZ">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column_z">
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+              <br>
+              <div class="column">
+                <div class="box" style="width:300px;" id="">
+                  <strong>Y-axis</strong>
+                  <div class="field" id="y_axis_selectors">
+                    <input class="is-radio" id="volume_rbtn" checked type="radio" name="exampleRadioInline_3_y" value="volume" onclick="setSelected_Y_Val('volume')">
+                    <label for="volume_rbtn">Volume</label>
+                    <br>
+                    <input class="is-radio" id="escalated_volume_rbtn" type="radio" name="exampleRadioInline_3_y" value="escalated volume" onclick="setSelected_Y_Val('escalated volume')">
+                    <label for="escalated_volume_rbtn">Escalated Volume</label>
+                    <br>
+                    <input class="is-radio" id="mttr_rbtn" type="radio" name="exampleRadioInline_3_y" value="mttr" onclick="setSelected_Y_Val('mttr')">
+                    <label for="mttr_rbtn">MTTR</label>
+                    <br>
+                    <!-- <input class="is-radio" id="Ageing_rbtn" type="radio" name="exampleRadioInline_3_y" value="ageing of open and pending" onclick="setSelected_Y_Val('ageing of open and pending')">
+                    <label for="mttr_rbtn">Ageing of Open and Pending</label> -->
+                    <br>
+                  </div>
+                </div>
+              </div>
+              <div class="column">
+                <div class="control">
+                  <button class="button is-primary" onclick="stackedbarchart();">Create</button>
+                </div>
+              </div>
+            </div>
+
+
+
+
+            <div id="test4" class="col s12">
+              <div class="columns">
+
+
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>X-axis</strong>
+                    <div class="field" id="x_axis_field">
+                      <input class="is-radio" id="status_rbtn" checked type="radio" name="exampleRadioInline4" value="status" onclick="showClassifiers('status')">
+                      <label for="status_rbtn">Status</label>
+                      <br>
+                      <input class="is-radio" id="severity_rbtn" type="radio" name="exampleRadioInline4" value="severity" onclick="showClassifiers('severity')">
+                      <label for="severity_rbtn">Severity</label>
+                      <input class="is-radio" id="pc_rbtn" type="radio" name="exampleRadioInline4" value="platform category" onclick="showClassifiers('platform category')">
+                      <label for="pc_rbtn">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn" type="radio" name="exampleRadioInline4" value="source" onclick="showClassifiers('source')">
+                      <label for="source_rbtn">Source</label>
+                      <input class="is-radio" id="month_rbtn" type="radio" name="exampleRadioInline4" value="month" onclick="showClassifiers('month')">
+                      <label for="month_rbtn">Month</label>
+                      <br>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiers">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column">
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="box" style="width:300px;" id="">
+
+                    <strong>Y-axis</strong>
+                    <div class="field" id="y_axis_selectors">
+                      <input class="is-radio" id="volume_rbtn" checked type="radio" name="exampleRadioInline_y_4" value="volume" onclick="setSelected_Y_Val('volume')">
+                      <label for="volume_rbtn">Volume</label>
+                      <br>
+                      <input class="is-radio" id="escalated_volume_rbtn" type="radio" name="exampleRadioInline_y_4" value="escalated volume" onclick="setSelected_Y_Val('escalated volume')">
+                      <label for="escalated_volume_rbtn">Escalated Volume</label>
+                      <br>
+                      <input class="is-radio" id="mttr_rbtn" type="radio" name="exampleRadioInline_y_4" value="mttr" onclick="setSelected_Y_Val('mttr')">
+                      <label for="mttr_rbtn">MTTR</label>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="column">
+                  <div class="control">
+                    <button class="button is-primary" onclick="piechart();">Create</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div id="test5" class="col s12">
+              <div class="columns">
+
+
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>X-axis</strong>
+                    <div class="field" id="x_axis_field">
+                      <input class="is-radio" id="status_rbtn" checked type="radio" name="exampleRadioInline5" value="status" onclick="showClassifiers('status')">
+                      <label for="status_rbtn">Status</label>
+                      <br>
+                      <input class="is-radio" id="severity_rbtn" type="radio" name="exampleRadioInline5" value="severity" onclick="showClassifiers('severity')">
+                      <label for="severity_rbtn">Severity</label>
+                      <input class="is-radio" id="pc_rbtn" type="radio" name="exampleRadioInline5" value="platform category" onclick="showClassifiers('platform category')">
+                      <label for="pc_rbtn">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn" type="radio" name="exampleRadioInline5" value="source" onclick="showClassifiers('source')">
+                      <label for="source_rbtn">Source</label>
+                      <input class="is-radio" id="month_rbtn" type="radio" name="exampleRadioInline5" value="month" onclick="showClassifiers('month')">
+                      <label for="month_rbtn">Month</label>
+                      <br>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiers">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column">
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="box" style="width:200px;" id="">
+
+                    <strong>Z-axis</strong>
+                    <div class="field" id="z_axis_field">
+                      <input class="is-radio" id="status_rbtn_z" type="radio" name="exampleRadioInline_5_z" value="status" onclick="showClassifiersForZ_axis('status')">
+                      <label for="status_rbtn_z">Status</label>
+                      <br>
+                      <input class="is-radio" checked id="severity_rbtn_z" type="radio" name="exampleRadioInline_5_z" value="severity" onclick="showClassifiersForZ_axis('severity')">
+                      <label for="severity_rbtn_z">Severity</label>
+                      <input class="is-radio" id="pc_rbtn_z" type="radio" name="exampleRadioInline_5_z" value="platform category" onclick="showClassifiersForZ_axis('platform category')">
+                      <label for="pc_rbtn_z">Platform Category</label>
+                      <br>
+                      <input class="is-radio" id="source_rbtn_z" type="radio" name="exampleRadioInline_5_z" value="source" onclick="showClassifiersForZ_axis('source')">
+                      <label for="source_rbtn_z">Source</label>
+                      <input class="is-radio" id="month_rbtn_z" type="radio" name="exampleRadioInline_5_z" value="month" onclick="showClassifiersForZ_axis('month')">
+                      <label for="month_rbtn_z">Month</label>
+                      <br>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+
+                  <div class="box" style="width:250px;" id="classifiersZ">
+                    <strong>Classifiers</strong>
+                    <div class="field" id="classifiers_column_z">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <div class="column">
+                <div class="box" style="width:300px;" id="">
+
+                  <strong>Y-axis</strong>
+                  <div class="field" id="y_axis_selectors">
+                    <input class="is-radio" id="volume_rbtn" checked type="radio" name="exampleRadioInline_5_y" value="volume" onclick="setSelected_Y_Val('volume')">
+                    <label for="volume_rbtn">Volume</label>
+                    <br>
+                    <input class="is-radio" id="escalated_volume_rbtn" type="radio" name="exampleRadioInline_5_y" value="escalated volume" onclick="setSelected_Y_Val('escalated volume')">
+                    <label for="escalated_volume_rbtn">Escalated Volume</label>
+                    <br>
+                    <input class="is-radio" id="mttr_rbtn" type="radio" name="exampleRadioInline_5_y" value="mttr" onclick="setSelected_Y_Val('mttr')">
+                    <label for="mttr_rbtn">MTTR</label>
+                    <br>
+                  </div>
+                </div>
+              </div>
+              <div class="column">
+                <div class="control">
+                  <button class="button is-primary" onclick="groupedbarchart();">Create</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- launching example modal -->
+
+
+
+
+
+
+
+
+
+
+  <script type="text/javascript" src="js/restcall.js">
+  </script>
+  <script type="text/javascript" src="js/tablePopulation.js">
+  </script>
+  <script type="text/javascript" src="js/export.js">
+  </script>
+  <script type="text/javascript" src="js/dropdownPopulation.js"></script>
+  <script type="text/javascript" src="js/optionSelection.js"></script>
+
+  <script type="text/javascript" src="js/datahandler.js">
+  </script>
+  <script type="text/javascript">
+    $(function() {
+      $('#PartnerSelect').selectize({
+        plugins: ['remove_button']
+      });
+    });
+    //here is the modal launcher
+
+
+    $("#cancel-btn").click(function() {
+      $(".modal").removeClass("is-active");
+    });
+    $("#modal-close").click(function() {
+      $(".modal").removeClass("is-active");
+    });
+    $("#save-changes").click(function() {
+      $(".modal").removeClass("is-active");
+    });
+
+    //switch checkbox
+    function doload1(checkbox) {
+      //  console.log("Entered Here");
+      if (document.getElementById("switchThinColorDefault").value == "OFF") {
+        document.getElementById("switchThinColorDefault").value = "ON";
+        document.getElementById('innerTextTwo').innerText = "By";
+        switch_pc = 0;
+      } else if (document.getElementById("switchThinColorDefault").value == "ON") {
+        document.getElementById("switchThinColorDefault").value = "OFF";
+        document.getElementById('innerTextTwo').innerText = "For";
+        switch_pc = 1;
+
+      }
+      setorg();
+    }
+  </script>
+  <script>
+
+
+    function switchToAll()
+    {
+      removeActive();
+      hideAll();
+      $("#all-tab").addClass("is-active");
+      $("#all-tab-content").removeClass("hidden");
+      document.getElementById('tabler').style.display = 'block';
+      document.getElementById('customcharter').style.display = 'none';
+    }
+
+    function switchToAdaptiveDesign() {
+      removeActive();
+      hideAll();
+      $("#adaptivedesign-tab").addClass("is-active");
+      $("#adaptivedesign-tab-content").removeClass("hidden");
+      document.getElementById('customcharter').style.display = 'none';
+      drawCharts();
+    }
+
+    function switchToJquery() {
+      removeActive();
+      hideAll();
+      $("#jquery-tab").addClass("is-active");
+      $("#customcharter").removeClass("hidden");
+      document.getElementById('customcharter').style.display = 'block'
+
+      onresponse();
+      switchToBarChart();
+    }
+
+    function switchToBarChart() {
+      removeActive1();
+      hideAll1();
+      $("#barchart-tab").addClass("is-active");
+      $("#test1").removeClass("hidden");
+      hideUnusedCharts('barchart');
+    }
+
+    function switchToLineChart() {
+      removeActive1();
+      hideAll1();
+      $("#linechart-tab").addClass("is-active");
+      $("#test2").removeClass("hidden");
+      hideUnusedCharts('linechart')
+    }
+
+    function switchToStBarChart() {
+      removeActive1();
+      hideAll1();
+      $("#stBar-tab").addClass("is-active");
+      $("#test3").removeClass("hidden");
+      hideUnusedCharts('stackedchart')
+    }
+
+    function switchToPieChart() {
+      removeActive1();
+      hideAll1();
+      $("#piechart-tab").addClass("is-active");
+      $("#test4").removeClass("hidden");
+      hideUnusedCharts('piechart')
+    }
+
+    function switchToGrpBarChart() {
+      removeActive1();
+      hideAll1();
+      $("#GrBar-tab").addClass("is-active");
+      $("#test5").removeClass("hidden");
+      hideUnusedCharts('groupedbarchart')
+    }
+
+    function removeActive() {
+      $(".mainer").each(function() {
+        $(this).removeClass("is-active");
+      });
+    }
+
+    function removeActive1() {
+      $(".submainer").each(function() {
+        $(this).removeClass("is-active");
+      });
+    }
+
+    function hideAll() {
+      $("#all-tab-content").addClass("hidden");
+      $("#adaptivedesign-tab-content").addClass("hidden");
+      $("#jquery-tab-content").addClass("hidden");
+
+    }
+
+    function hideAll1() {
+      $("#test1").addClass("hidden");
+      $("#test2").addClass("hidden");
+      $("#test3").addClass("hidden");
+      $("#test4").addClass("hidden");
+      $("#test5").addClass("hidden");
+
+    }
+  </script>
+
+</body>
+
+</html>
